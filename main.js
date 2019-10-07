@@ -35,13 +35,20 @@ class Blockchain {
 
 	isChainValid() {
 		for (let i=1; i<this.chain.length; i++) {
-			const currentBock = this.chain[i];
+			const currentBlock = this.chain[i];
 			const prevBlock = this.chain[i-1];
 
-			if (currentBlock.hash != currentBlock.calculateHash()) {
+			//error i: checks if the current block is tempered
+			if (currentBlock.hash !== currentBlock.calculateHash()) {
+				return false;
+			}
+
+			//error ii: check if the previous block is a valid link
+			if (prevBlock.hash !== currentBlock.previousHash) {
 				return false;
 			}
 		}
+		return true;
 	}
 
 }
@@ -51,5 +58,20 @@ let savjeeCoin = new Blockchain();
 savjeeCoin.addBlock(new Block(1, '02/01/2019', {amount: 4}));
 savjeeCoin.addBlock(new Block(2, '03/01/2019', {amount: 10}));
 
-console.log(JSON.stringify(savjeeCoin, null, 4));
 
+console.log("Is blockchain valid? " + savjeeCoin.isChainValid());
+
+//error i
+savjeeCoin.chain[1].data = {amount: 3};
+console.log("Is blockchain valid? " + savjeeCoin.isChainValid());
+// console.log("current hash: " + savjeeCoin.chain[1].hash);
+// console.log("calculated current hash: " + savjeeCoin.chain[1].calculateHash());
+
+//error ii
+savjeeCoin.chain[1].hash = savjeeCoin.chain[1].calculateHash()
+console.log("Is blockchain valid? " + savjeeCoin.isChainValid()); 
+// console.log("current prev hash:" + savjeeCoin.chain[2].previousHash);
+// console.log("true previous hash: " + savjeeCoin.chain[1].hash);
+
+
+// console.log(JSON.stringify(savjeeCoin, null, 4));
