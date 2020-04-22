@@ -1,0 +1,87 @@
+---
+title: "STAC51A2Q3"
+output:
+  word_document: default
+  html_notebook: default
+---
+```{r}
+#3a)
+set.seed(101)
+rn <- rbinom(2, 10, 0.4)
+rn
+
+```
+
+```{r}
+#3b)
+n11 <- rn[1]
+n21 <- rn[2]
+n1plus <- 10
+n2plus <- 10
+ntable <- array(data = c(n11, n21, n1plus-n11, n2plus-n21), dim = c(2,2))
+ntable
+```
+
+
+
+```{r}
+#3c
+ft <- fisher.test(ntable)
+ft
+#get p-value
+ft$p.value
+```
+P-value large (>0.05) at 5% level significance. Cannot reject null hypothesis of independence between row and column vars.
+
+```{r}
+#3d)
+#setup
+set.seed(101)
+pvals <- vector()
+n1plus <- 10
+n2plus <- 10
+
+for (i in 1:10000) {
+  #generate random numbers
+  rn <- rbinom(2, 10, 0.4)
+  #generate tables
+  n11 <- rn[1]
+  n21 <- rn[2]
+  
+  #fisher test on respective table
+  pvals[i] <- fisher.test(array(data = c(n11, n21, n1plus-n11, n2plus-n21), dim = c(2,2)))$p.value
+}
+#the first 5 p-values
+pvals[1:5]
+#count the number of successful rejects for null hypothesis
+rejects <- sum(pvals<0.05)
+rejects
+```
+Null hypothesis is rejected 116 times out of 10000. So we're more confident to not reject the H0 of independence of the row and column variables.
+
+```{r}
+#setup
+set.seed(101)
+pvals <- vector()
+n1plus <- 100
+n2plus <- 100
+
+for (i in 1:10000) {
+  #generate random numbers
+  rn <- rbinom(2, 100, 0.4)
+  #generate tables
+  n11 <- rn[1]
+  n21 <- rn[2]
+  
+  #fisher test on respective table
+  pvals[i] <- fisher.test(array(data = c(n11, n21, n1plus-n11, n2plus-n21), dim = c(2,2)))$p.value
+}
+#the first 5 p-values
+pvals[1:5]
+#count the number of successful rejects for null hypothesis
+rejects <- sum(pvals<0.05)
+rejects
+```
+Null hypothesis is rejected 354 times out of 10000. Again, we're more confident to not reject the H0 of independence of the row and column variables. This time a larger n, we got more successful rejects of H0.
+
+

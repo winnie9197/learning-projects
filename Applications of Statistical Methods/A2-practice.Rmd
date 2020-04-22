@@ -1,0 +1,59 @@
+---
+title: "A2 practice"
+output: html_notebook
+---
+Questions 1-3
+#Setup: [Sturges, Freedman-Diaconis], [t-test & Quantile-Quantile Plot]
+```{r}
+library(tidyverse)
+link = "http://www.utsc.utoronto.ca/~butler/c32/ncbirths.csv"
+births = read_csv(link)
+births
+glimpse(births)
+ggplot(births,aes(`Weight (pounds)`))+geom_histogram(bins=10)
+```
+```{r}
+nclass.Sturges(births$`Weight (pounds)`)
+nclass.FD(births$`Weight (pounds)`)
+```
+```{r}
+ggplot(births, aes(x=`Weight (pounds)`))+geom_density()
+```
+```{r}
+ggplot(births, aes(1,`Weight (pounds)`))+geom_boxplot()
+```
+```{r}
+ ggplot(births,aes(x=factor(`Premie?`),y=`Weeks Gestation`))+geom_boxplot()
+```
+
+```{r}
+births %>% group_by(`Premie?`) %>%
+  summarize( n=n(),
+             min=min(`Weeks Gestation`),
+             max=max(`Weeks Gestation`))
+```
+
+```{r}
+births %>% filter(is.na(`Premie?`)) %>%
+  gather(name,value,everything())
+```
+
+```{r}
+ggplot(births,aes(x=`Weeks Gestation`,y=`Weight (pounds)`,colour=factor(`Premie?`)))+geom_point()
+```
+
+#3
+```{r}
+t.test(births$`Weight (pounds)`)
+```
+
+```{r}
+t.test(births$`Weight (pounds)`,mu=7.3,alternative="less")
+```
+
+```{r}
+ggplot(births,aes(`Weight (pounds)`))+geom_histogram(bins=10)
+```
+```{r}
+ggplot(births,aes(sample=`Weight (pounds)`))+stat_qq()+stat_qq_line()
+```

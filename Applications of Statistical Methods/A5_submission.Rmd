@@ -1,0 +1,66 @@
+---
+title: "A5_submission"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+6) 
+
+```{r}
+library(tidyverse)
+library(smmr)
+```
+
+```{r}
+#6a
+file = "https://www.utsc.utoronto.ca/~butler/c32/mm.txt"
+eating = read_delim(file, " ")
+eating
+
+eating %>% count(gender)
+```
+
+
+```{r}
+#6b
+ggplot(eating, aes(gender, candies)) + geom_boxplot()
+```
+
+6c) The graph for females is right skewed. The spread is uneven, which means there are the same amount of people eating between around 31-46 (median) and 46-85 candies. (Disclaimer: These numbers are purely from observing the graphs, and might not the same as the true values.) Meanwhile, not many males have a high candies count, with an  exception of one outlier. The median of both male and female counts in candies consumption is similar.
+
+6d) Since we see skewness and outliers in the two sets, we cannot assume they are normally distributed, which is the basis for a two-sample t-test.
+
+```{r}
+#6e
+median_test(eating, candies, gender)
+```
+Since the p-value is large when two-sided (0.371 > 0.05), we don't have enough evidence to reject the null hypothesis that the two genders have the same median. We cannot say the difference between males and females in the amount of candies eaten is statistically significant.
+
+```{r}
+#7a
+file2 = "https://www.utsc.utoronto.ca/~butler/c32/coffee.txt"
+coffee = read_delim(file2, " ")
+coffee
+```
+
+```{r}
+#7b
+ggplot(coffee, aes(cup, tempdiff)) + geom_boxplot()
+```
+
+```{r}
+#7c
+coffeeAOV = aov(tempdiff~cup,data=coffee) 
+summary(coffeeAOV)
+```
+With a small p-value (2.77e-05), we can reject the null hypothesis that all of the four types of coffee have equal mean temperature. We can then run further tests to find out which of the groups are different.
+
+```{r}
+#7d
+TukeyHSD(coffeeAOV)
+```
+
+7e) Judging by the p-values, there is a mug brand significantly different. Among all, only Nissan is statistical significant in all of its comparisons.
+
+7f) The assumptions for the Tukey test is shaky. The spread for Nissan and Starbucks appear to be less than the other two brands, also there is skewness in some brands which might indicate opposite of normally distributed data.

@@ -1,0 +1,17 @@
+---
+title: "A6_practice"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+file13 = "https://www.utsc.utoronto.ca/~butler/c32/texmex.txt"
+mex = read.delim(file13, ' ')
+mex
+```
+
+

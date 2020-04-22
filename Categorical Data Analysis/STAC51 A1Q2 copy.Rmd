@@ -1,0 +1,29 @@
+---
+title: "STAC51 A1Q2"
+output: html_notebook
+---
+2) 
+```{r}
+#define variables, our values
+c <- 1:18
+n = 30
+pi = 0.4
+```
+
+c) 
+```{r}
+lambda = n*pi
+#σ2 =nπ(1−π)
+variance = n*pi*(1-pi)
+sd = sqrt(variance)
+
+#Y ∼N(μ=nπ,σ2 =nπ(1−π)).
+#norm_p_vals <- round(pnorm(12-c,lambda,sd) + 1  -pnorm(12+c,lambda,sd),4)
+norm_p_val1 = qnorm(0.025,lambda,sd)-12
+norm_p_val2 = qnorm(0.975,lambda,sd)-12
+norm_p_val1
+norm_p_val2
+```
+Answer: c ~= 5.26 assuming Y ∼N(μ=nπ,σ2 =nπ(1−π)).
+
+

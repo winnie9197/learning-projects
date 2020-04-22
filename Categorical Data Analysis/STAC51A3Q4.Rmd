@@ -1,0 +1,94 @@
+---
+title: "STAC51A3Q4"
+output:
+  word_document: default
+  html_notebook: default
+---
+```{r}
+#4a)
+doseLevel <- c(0:5)
+dead <- c(1, 4, 9, 13, 18, 20)
+cbind(doseLevel, dead)
+
+notDead <- 20-dead
+reg <- glm( cbind(dead, notDead) ~ doseLevel , family = binomial)
+summary(reg)
+```
+```{r}
+#4b
+G2 <- 71.138-1.881
+G2
+
+qchisq(0.95, 1)
+```
+At alpha = 0.05, df=1 (Chi-sq), test statistic is 69.257 > 3.84. Can reject null hypothesis. Dose level has significant effect on the model.
+
+```{r}
+#4c
+y <- (-2.8186+1.25898*(3))
+estimate <- exp(1)^y/(1+exp(1)^y)
+estimate
+```
+Estimate is 0.7227893 when dose level = 3.
+
+```{r}
+#4d)
+p_x <- 0.75
+EL <- (log(p_x/(1-p_x))-(-2.8186))/1.2589
+EL
+```
+EL0.75 is 3.111615.
+
+```{r}
+#4e
+pearson_res <- resid(reg, type = "pearson")
+pearson_res
+
+std_res <- resid(reg, type = "pearson")/sqrt(1 - lm.influence(reg)$hat)
+std_res
+```
+```{r}
+#4f
+#H0: the logistic regression model fits the data
+#H1: the saturated model fits the data better
+chi2 <- sum(pearson_res^2)
+chi2
+
+qchisq(1-0.05, 4)
+```
+chi2 = 1.308896 < 9.487729, cannot reject null hypothesis, so we should say the logistic regression model is sufficient to fit the data.
+
+```{r}
+#4g)
+dev_res <- resid(reg, type = "deviance")
+dev_res
+```
+
+```{r}
+#4h)
+#variance-cov matrix
+cov <- vcov(reg)
+cov
+
+alpha <-  -2.8186
+beta <- 1.2589
+x <- 2.5
+l <- alpha +beta*x
+
+#standard deviation
+se <- sqrt(0.3002896 + (x^2)*0.04497177+2*x*(-0.10267712))
+se
+
+#lower and upper bound
+lower <- l-1.96*se
+lower
+upper <- l+1.96*se
+upper
+
+#CI
+prob_lower <- exp(1)^lower/(1+ exp(1)^lower)
+prob_lower
+prob_upper <- exp(1)^upper/(1+ exp(1)^upper)
+prob_upper
+```
+The 95% CI for prob(2.5) is [0.4545332,0.6983959].

@@ -1,0 +1,481 @@
+---
+title: "C67CaseStudy"
+author: "Jiahong Wang", "Winnie Yeung", "Shrinivas Shirgaonkar", "Xue Jiashu"
+date: "2018.11.30"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(mosaic)
+library(MASS)
+library(leaps)
+value <- read.table("APPENC05.txt", quote="\"", comment.char="")
+x1 = "Identification number"
+x2 = "PSA_Level"
+x3 = "Cancer_Volume"
+x4 = "Weight"
+x5 = "Age"
+x6 = "benign_prostatic_hyperplasia"
+x7 = "seminal_vesicle_invasion"
+x8 = "capsular_penetration"
+x9 = "Gleason_score"
+colnames(value) <- c(x1,x2,x3,x4,x5,x6,x7,x8,x9)
+```
+
+```{r}
+n = cor(value)
+```
+
+```{r}
+modeltest = lm(PSA_Level~value[,c(3)]+value[,c(6)]+value[,c(7)]+value[,c(9)],data = value)
+summary(modeltest)
+```
+
+# Y
+### model1 Y with X3 X5 X6 X7 X8 X9
+```{r}
+value$PSA_Level = value$PSA_Level
+testvalue = value
+model1_Y = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(5)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(8)]+testvalue[,c(9)],data = testvalue)
+summary(model1_Y)
+
+## AIC
+n = nrow(value)
+s5 <- summary(model1_Y)$sigma
+SSres5 <- sum(model1_Y$residuals^2)
+Rsq5 <- summary(model1_Y)$r.squared
+Rsq_adj5 <- summary(model1_Y)$adj.r.squared
+p_prime5 <- length(model1_Y$coefficients)
+AIC5 <- n*log(SSres5) - n*log(n) + 2*p_prime5
+
+y_pred = predict(model1_Y,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE5 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res5 <- (summary(model1_Y)$sigma)^2
+MSd5 = MS_res5 - MSPE5
+sum5 = sum((value[,2]- predict(model1_Y))^2)
+```
+
+### model2 Y with X3 X4 X6 X7 X8 X9
+```{r}
+testvalue = value[,]
+model2_Y = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(4)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(8)]+testvalue[,c(9)],data = testvalue)
+summary(model2_Y)
+
+## AIC
+n = nrow(value)
+s6 <- summary(model2_Y)$sigma
+SSres6 <- sum(model2_Y$residuals^2)
+Rsq6 <- summary(model2_Y)$r.squared
+Rsq_adj6 <- summary(model2_Y)$adj.r.squared
+p_prime6 <- length(model2_Y$coefficients)
+AIC6 <- n*log(SSres6) - n*log(n) + 2*p_prime6
+
+
+
+
+y_pred = predict(model2_Y,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE6 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res6 <- (summary(model2_Y)$sigma)^2
+MSd6 = MS_res6 - MSPE6
+sum6 = sum((value[,2]- predict(model2_Y))^2)
+
+```
+
+### model3 Y with X3 X4 X5 X6 X7 X9
+```{r}
+testvalue = value
+model3_Y = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(4)]+testvalue[,c(5)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(9)],data = testvalue)
+summary(model3_Y)
+
+## AIC
+n = nrow(value)
+s3 <- summary(model3_Y)$sigma
+SSres3 <- sum(model3_Y$residuals^2)
+Rsq3 <- summary(model3_Y)$r.squared
+Rsq_adj3 <- summary(model3_Y)$adj.r.squared
+p_prime3 <- length(model3_Y$coefficients)
+AIC3 <- n*log(SSres3) - n*log(n) + 2*p_prime3
+
+y_pred = predict(model3_Y,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE3 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res3 <- (summary(model3_Y)$sigma)^2
+MSd3 = MS_res3 - MSPE3
+sum3 = sum((value[,2]- predict(model3_Y))^2)
+
+```
+
+###########################
+Proving why log-linear regression model is preferable to linear regression model
+#show the assumptions for linear regression model:
+```{r}
+#set up
+residual_value_m1Y = resid(model1_Y)
+fitted_value_m1Y = fitted(model1_Y)
+
+residual_value_m2Y = resid(model2_Y)
+fitted_value_m2Y = fitted(model2_Y)
+
+residual_value_m3Y = resid(model3_Y)
+fitted_value_m3Y = fitted(model3_Y)
+```
+
+1-  linearity of relation between true mean of Y and X
+```{r}
+#plot residuals against predictor vars: model 1,2,3
+
+par(mfrow = c(2,2))
+#model 1
+plot(residual_value_m1Y~value[,c(3)], xlab = x3, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m1Y~value[,c(5)], xlab = x5, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m1Y~value[,c(6)], xlab = x6, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m1Y~value[,c(7)], xlab = x7, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m1Y~value[,c(8)], xlab = x8, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m1Y~value[,c(9)], xlab = x9, ylab = "Residuals")
+abline(h = 0)
+```
+```{r}
+#model 2
+par(mfrow = c(2,2))
+plot(residual_value_m2Y~value[,c(3)], xlab = x3, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y~value[,c(4)], xlab = x4, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y~value[,c(6)], xlab = x6, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y~value[,c(7)], xlab = x7, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y~value[,c(8)], xlab = x8, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y~value[,c(9)], xlab = x9, ylab = "Residuals")
+abline(h = 0)
+```
+```{r}
+#model 3
+par(mfrow = c(2,2))
+plot(residual_value_m3Y~value[,c(3)], xlab = x3, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y~value[,c(4)], xlab = x4, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y~value[,c(8)], xlab = x5, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y~value[,c(6)], xlab = x6, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y~value[,c(7)], xlab = x7, ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y~value[,c(9)], xlab = x9, ylab = "Residuals")
+abline(h = 0)
+```
+
+2- No Multicollinearity
+```{r}
+VIF_1Y <- vif(model1_Y)
+#min1Y <- summary(VIF_1Y)
+VIFbar_1Y <- mean(vif(model1_Y))
+model1_VIF <- c(max(VIF_1Y), min(VIF_1Y), VIFbar_1Y)
+
+VIF_2Y <- vif(model2_Y)
+VIFbar_2Y <- mean(vif(model2_Y))
+model2_VIF <- c(max(VIF_2Y), min(VIF_2Y), VIFbar_2Y)
+
+VIF_3Y <- vif(model3_Y)
+VIFbar_3Y <- mean(vif(model3_Y))
+model3_VIF <- c(max(VIF_3Y), min(VIF_3Y), VIFbar_3Y)
+
+VIF_summ <- rbind(model1_VIF, model2_VIF, model3_VIF)
+colnames(VIF_summ) <- c("max","min","mean")
+
+VIF_summ
+```
+
+3- constant variance of errors (homoscedasticity)
+```{r}
+#plot residuals against fitted values
+par(mfrow = c(1,2))
+plot(residual_value_m1Y ~ fitted_value_m1Y, xlab = "Fitted 1", ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m2Y ~ fitted_value_m2Y, xlab = "Fitted 2", ylab = "Residuals")
+abline(h = 0)
+plot(residual_value_m3Y ~ fitted_value_m3Y, xlab = "Fitted 3", ylab = "Residuals")
+abline(h = 0)
+```
+
+4- normality of errors
+```{r}
+#Normal Q-Q plot: model 1,2,3
+qqnorm(residual_value_m1Y) 
+qqline(residual_value_m1Y)
+
+qqnorm(residual_value_m2Y)
+qqline(residual_value_m2Y)
+
+qqnorm(residual_value_m3Y) 
+qqline(residual_value_m3Y)
+
+```
+
+#writeup after
+#...
+
+############end of proof#############
+
+# LnY
+### model1 LnY with X3 X5 X6 X7 X8 X9
+```{r}
+
+testvalue = value
+model1 = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(5)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(8)]+testvalue[,c(9)],data = testvalue)
+summary(model1)
+
+## AIC
+n = nrow(value)
+s5 <- summary(model1)$sigma
+SSres5 <- sum(model1$residuals^2)
+Rsq5 <- summary(model1)$r.squared
+Rsq_adj5 <- summary(model1)$adj.r.squared
+p_prime5 <- length(model1$coefficients)
+AIC5 <- n*log(SSres5) - n*log(n) + 2*p_prime5
+
+y_pred = predict(model1,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE5 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res5 <- (summary(model1)$sigma)^2
+MSd5 = MS_res5 - MSPE5
+sum5 = sum((value[,2]- predict(model1))^2)
+
+
+##--------------
+
+residual_value = resid(model1)
+fitted_value = fitted(model1)
+plot(residual_value ~ fitted_value)
+qqnorm(residual_value) 
+qqline(residual_value)
+```
+
+### model2 LnY with X3 X4 X6 X7 X8 X9
+```{r}
+testvalue = value[,]
+model2 = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(4)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(8)]+testvalue[,c(9)],data = testvalue)
+summary(model2)
+
+## AIC
+n = nrow(value)
+s6 <- summary(model2)$sigma
+SSres6 <- sum(model2$residuals^2)
+Rsq6 <- summary(model2)$r.squared
+Rsq_adj6 <- summary(model2)$adj.r.squared
+p_prime6 <- length(model2$coefficients)
+AIC6 <- n*log(SSres6) - n*log(n) + 2*p_prime6
+
+
+
+
+y_pred = predict(model2,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE6 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res6 <- (summary(model2)$sigma)^2
+MSd6 = MS_res6 - MSPE6
+sum6 = sum((value[,2]- predict(model2))^2)
+
+
+
+##--------------
+residual_value = resid(model2)
+fitted_value = fitted(model2)
+plot(residual_value ~ fitted_value)
+qqnorm(residual_value) 
+qqline(residual_value)
+```
+
+### model3 LnY with X3 X4 X5 X6 X7 X9
+```{r}
+testvalue = value
+model3 = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(4)]+testvalue[,c(5)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(9)],data = testvalue)
+summary(model3)
+
+## AIC
+n = nrow(value)
+s3 <- summary(model3)$sigma
+SSres3 <- sum(model3$residuals^2)
+Rsq3 <- summary(model3)$r.squared
+Rsq_adj3 <- summary(model3)$adj.r.squared
+p_prime3 <- length(model3$coefficients)
+AIC3 <- n*log(SSres3) - n*log(n) + 2*p_prime3
+AIC3test = AIC(model3)
+
+
+
+
+y_pred = predict(model3,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE3 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res3 <- (summary(model3)$sigma)^2
+MSd3 = MS_res3 - MSPE3
+sum3 = sum((value[,2]- predict(model3))^2)
+
+
+
+##--------------
+residual_value = resid(model3)
+fitted_value = fitted(model3)
+plot(residual_value ~ fitted_value)
+qqnorm(residual_value) 
+qqline(residual_value)
+```
+
+### model4 LnY with X3 X6 X7 X9
+```{r}
+testvalue = value
+model4 = lm(PSA_Level~testvalue[,c(3)]+testvalue[,c(6)]+testvalue[,c(7)]+testvalue[,c(9)],data = testvalue)
+summary(model4)
+
+## AIC
+n = nrow(value)
+s4 <- summary(model4)$sigma
+SSres4 <- sum(model4$residuals^2)
+Rsq4 <- summary(model4)$r.squared
+Rsq_adj4 <- summary(model4)$adj.r.squared
+p_prime4 <- length(model4$coefficients)
+AIC4 <- n*log(SSres4) - n*log(n) + 2*p_prime4
+AIC4test = AIC(model4)
+
+
+
+y_pred = predict(model4,value[,])
+y_obs = value[,2]
+n_star <- nrow(value)
+MSPE3 <- sum( (y_obs-y_pred)^2/n_star )
+MS_res3 <- (summary(model4)$sigma)^2
+MSd3 = MS_res3 - MSPE3
+sum3 = sum((value[,2]- predict(model4))^2)
+
+
+##--------------
+residual_value = resid(model4)
+fitted_value = fitted(model4)
+plot(residual_value ~ fitted_value)
+qqnorm(residual_value) 
+qqline(residual_value)
+```
+
+
+### By the AIC, we select the model2, model3, and by the difference between MS_res and MSPE, the minimal difference is model4 lny with X3 X6 X7 X9
+### And we validate this model
+
+# Model diagnostics
+#--------------------
+# Functional form
+```{r}
+model = lm(PSA_Level~value[,c(3)]+value[,c(6)]+value[,c(7)]+value[,c(9)],data = value)
+par(mfrow = c(2,2))
+plot(model$residuals~value[,c(3)], xlab = x3, ylab = "Residuals")
+abline(h = 0)
+plot(model$residuals~value[,c(6)], xlab = x6, ylab = "Residuals")
+abline(h = 0)
+plot(model$residuals~value[,c(7)], xlab = x7, ylab = "Residuals")
+abline(h = 0)
+plot(model$residuals~value[,c(9)], xlab = x9, ylab = "Residuals")
+abline(h = 0)
+```
+
+```{r}
+plot(model$residuals~model$fitted.values, xlab = "Fitted values", ylab = "Residuals")
+abline(h = 0)
+
+```
+
+#### Outlying Y observations
+```{r}
+library(car)
+# Statistical test
+outlierTest(model)
+# Studentized deleted residuals
+n = 97
+t <- rstudent(model)
+alpha <- 0.05
+n <- length(value$PSA_Level)
+p_prime = length(coef(model)) 
+t_crit <- qt(1-alpha/(2*n),n-p_prime-1)
+t_crit
+which(abs(t) > t_crit)
+```
+# Outlying X observations 
+```{r}
+Pii <- hatvalues(model)
+
+which(Pii > 2*p_prime/n)
+
+which(Pii > 0.5)
+```
+
+# Influence 
+```{r}
+influencePlot(model,main="Influence Plot", sub="Circle size is proportial to Cook's Distance" )
+DFFITS <- dffits(model)
+which(DFFITS > 1)
+D <- cooks.distance(model)
+which(D > qf(0.2, p_prime, n-p_prime))
+DFBETAS <- dfbetas(model)
+head(DFBETAS)
+which(DFBETAS > 1)
+```
+
+
+
+
+
+# Multicollinearity
+```{r}
+VIF <- vif(model)
+VIF
+VIFbar <- mean(vif(model))
+VIFbar
+```
+
+# Matrix with Y, Yhat, P, e, t
+```{r}
+s <- summary(model)$sigma
+Y. <- value$PSA_Level
+Y.hat <- fitted(model)
+P <- hatvalues(model)
+e <- residuals(model)
+t <- rstudent(model) 
+DFFITS <- dffits(model)
+D <- cooks.distance(model)
+res <- cbind(Y., Y.hat, P, e, t, DFFITS, D)
+colnames(res) <- c("Y.", "Y.hat", "P", "e", "t","DFFITS", "D")
+res
+```
+
+
+# diagnostic plots
+```{r}
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
+plot(model)
+
+```
+
+```{r}
+mplot(model)
+```
+

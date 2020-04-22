@@ -1,0 +1,45 @@
+---
+title: "A1-submission"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+
+
+
+
+```{r}
+library(tidyverse)
+```
+
+4a)
+```{r}
+passengers = read_csv("http://www.utsc.utoronto.ca/~butler/c32/airline_passengers.csv")
+
+passengers
+```
+
+
+b) "the_date": date of the middle of the month which has "count""
+```{r}
+ggplot(passengers, aes(the_date,count))+geom_point()+geom_line()
+```
+
+
+c) There are 12 evenly (horizontally) spaced peaks approximately corresponding to each year. Overall, there is an increasing trend in terms of the number of passengers over the years.
+There might be a pattern between number of passengers and different times of a year, by the ups and downs of the data. 
+
+
+```{r}
+ggplot(passengers, aes(mm,count))+geom_boxplot()
+```
+
+
+d) mm is a categorical variable. The graph of raw data is sorts mm by alphabetical order. Some work is needed to sort the months, if we want to see what happens as a year progresses. Nonetheless, by reading the median counts of each month, we can see the counts are higher during months mid-year of any year (Jun-Sep) and lower during end of year (Nov-Feb).
+
+
+e) In part b), I inferred there might be a pattern associated between the number of passengers and different times of the year. This graph shows a similar trend, pointing out more people chose international air during certain seasons from the years 1949 to 1960.

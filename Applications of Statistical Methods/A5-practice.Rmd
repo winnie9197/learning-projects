@@ -1,0 +1,16 @@
+---
+title: "A5_practice"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+library(smmr)
+```
+
+```{r}
+url = "http://www.utsc.utoronto.ca/~butler/c32/bodyfat.txt"
+fat = read_delim(url," ")
+
+fat
+```
+

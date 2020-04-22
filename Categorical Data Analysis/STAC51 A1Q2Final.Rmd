@@ -1,0 +1,76 @@
+---
+title: "STAC51 A1Q2Final"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+2)
+
+```{r}
+#define variables, our values
+c <- 1:18
+n = 30
+pi = 0.4
+```
+
+a)
+P(|Y-n(pi)| >= c) 
+= P(-(Y-n(pi)) <= c <= Y-n(pi))
+# sub n and pi
+= P(12 - Y <= c <= Y + 12)
+then get: 
+= P(12 - Y <= c) + P(c <= Y + 12)
+= P(12 - Y <= c) + 1 - P(c > Y + 12)
+= P(12 - Y <= c) + 1 - P(c + 12 < Y)
+```{r}
+binom_p_vals <- pbinom(12-c,n,pi) + 1 - pbinom(12+c,n,pi)
+
+#display the values we get
+binom_p_vals
+```
+
+```{r}
+#tabulate our result
+binom_table <- cbind(c,round(binom_p_vals,4))
+#show table
+binom_table
+```
+
+Answer: c=5 has probability closest to 0.05 using binomial distribution.
+
+
+b) 
+```{r}
+lambda = n*pi
+#similar to 2a)
+pois_p_vals <- round(ppois(12-c,lambda) + 1  -ppois(12+c,lambda),4)
+
+#display the values we get
+pois_p_vals
+```
+
+```{r}
+#tabulate our result
+pois_table <- cbind(c,pois_p_vals)
+#show table
+pois_table
+```
+Answer: c=7 has probability closest to 0.05 using poisson approximation.
+
+
+c) 
+```{r}
+lambda = n*pi
+#σ2 =nπ(1−π)
+variance = n*pi*(1-pi)
+sd = sqrt(variance)
+
+#Y ∼N(μ=nπ,σ2 =nπ(1−π)).
+#norm_p_vals <- round(pnorm(12-c,lambda,sd) + 1  -pnorm(12+c,lambda,sd),4)
+norm_p_val1 = qnorm(0.025,lambda,sd)-12
+norm_p_val2 = qnorm(0.975,lambda,sd)-12
+norm_p_val1
+norm_p_val2
+```
+Answer: c ~= 5.26 assuming Y ∼N(μ=nπ,σ2 =nπ(1−π)).

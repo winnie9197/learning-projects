@@ -1,0 +1,48 @@
+---
+title: "STAC32 A4practice"
+output: html_notebook
+---
+
+1) 
+a,b) 
+```{r}
+library (tidyverse)
+file1 = "http://www.utsc.utoronto.ca/~butler/c32/maze.txt"
+maze = read.csv(file1)
+maze %>% count(time>60)
+p = sum(dbinom(0:5, 21, 0.5))
+p
+```
+```{r}
+#two-sided p-vale
+p*2
+```
+
+c)
+
+```{r}
+library(smmr)
+sign_test(maze,time,60)
+
+```
+#^^^^Has same p-values
+
+d)
+```{r}
+pval_sign(60, maze, time)
+```
+
+e)
+
+i) Method: trial and error
+```{r}
+pval_sign(58, maze, time)
+pval_sign(55, maze, time)
+meds = seq(55,58,0.25)
+meds
+
+#try all values of the sequence
+pvals=map_dbl(meds,pval_sign,maze,time)
+data.frame(meds,pvals)
+```
+

@@ -1,0 +1,129 @@
+---
+title: "D37-A5"
+output: word_document
+Contributors: Winnie Yeung, Andy Jung
+---
+```{r}
+library("dplyr")
+library("psych")
+```
+## Read table
+```{r}
+lifeEx <- read.table("lifeex.txt", header=TRUE)
+lifeEx
+
+```
+
+
+```{r}
+#1) correlation matrix for the variables except “country”
+round(cor(lifeEx[2:length(lifeEx)]), digits=2)
+```
+Comment: There are notably high correlations (>=0.8) between varaibles [m0,w0],[m0,w25],[w0,w25],[m50,w50],[w25,w50],[w50,w75]
+
+```{r}
+#2) mle factor analysis with rotation
+lifeEx %>% select_if(is.numeric)->lifeEx_1
+fit.mle2 <- factanal(lifeEx_1, factors=1, rotation="varimax", scores="regression")
+fit.mle2
+```
+Comment: Given a small p-value (1.88e-24 < 0.05), we can reject the null hypothesis. In this case, this means that the one-factor model does not fit the data perfectly.
+
+#3)Increase the number of factors. Which model fits the data well?
+
+
+```{r}
+#3a) 2 factors
+fit.mle3a <- factanal(lifeEx_1, factors=2, rotation="varimax", scores="regression")
+fit.mle3a
+```
+
+```{r}
+#3b) 3 factors
+fit.mle3b <- factanal(lifeEx_1, factors=3, rotation="varimax", scores="regression")
+fit.mle3b
+```
+Comment: A model with 3 factors would be an appropriate fit to the data, because the model with 3 factors has a large p-value (>0.05).
+
+#4)
+The following shows an interpretation of the 3 factors:
+Factor 1: Health factor
+Factor 2: Life satisfaction factor
+Factor 3: Logical development (ie: decision-making/rationality) factor
+
+
+```{r}
+#5) 
+#mle factor analysis with no rotation
+fit.mle5 <- factanal(lifeEx_1, factors=3, rotation="none", scores="regression")
+fit.mle5
+
+# Computing the loading matrix, communalities, specific variances and residual matrix
+# no rotation 
+L <- fit.mle5$load
+h <- apply(L^2, 1, sum)
+Psi <- fit.mle5$unique
+#with rotation
+L2 <- fit.mle3b$load
+h2 <- apply(L^2, 1, sum)
+Psi2 <- fit.mle3b$unique
+
+#output:
+L
+L2
+h
+h2
+Psi
+Psi2
+
+```
+Comment: 
+communalities: yes;
+specific variances and residual matrix: no.
+
+```{r}
+#6) 
+#pc factor analysis with rotation
+fit.pc<-principal(lifeEx_1, nfactors = 3, rotate="varimax", method="regression")
+fit.pc
+
+#mle factor analysis with rotation
+fit.mle3b
+```
+Comment: The chi-square value derived from the PCA method is 2.05, while the chi-square value derived from the MLE method is 6.73. A chi-square value closer to zero indicates a better fit: Therefore, the PCA method induces a better result. All communalities, specific variances, and residual matrices changed, although they generally do not deviate too far apart from each other.
+
+```{r}
+#7)
+#estimated factor scores
+fit.mle3b$scores
+```
+
+```{r}
+#8)
+countries <- as.vector(lifeEx[,1])
+new_scores <- data.frame(cbind(c(countries),fit.mle3b$scores))
+
+#sort the countries by factor 1
+table1<-new_scores[order(new_scores$Factor1),]
+#sort the countries by factor 2
+table2<-new_scores[order(new_scores$Factor2),]
+#sort the countries by factor 3
+table3<-new_scores[order(new_scores$Factor3),]
+```
+Comment: There's no observable pattern between the factors, but it seems that countries near the equator, or deemed as "less economically developed" have lower factor values in general.
+
+```{r}
+#9) 
+#qq-plots
+new_table1 <- as.numeric(as.character(table1[,2]))
+qqnorm(new_table1)
+new_table2 <- as.numeric(as.character(table2[,3]))
+qqnorm(new_table2)
+new_table3 <- as.numeric(as.character(table3[,4]))
+qqnorm(new_table3)
+
+#scatterplots
+plot(new_table1, pch=20)
+plot(new_table2, pch=20)
+```
+Comment: The diagonal fit of the three graphs seem quite normal in its linear, diagonal observation. In this respect, the normality assumption seems to generally hold, for all three plots. However, in sophistication, it seems that the first two are less "normal" in shape than the third. There are visible points that seem like outliers (ie: new_table1 at index 10, new_table2 at index 15 and 30). They show a sudden rise or drop, which may suggest unusual conditions or attributes at the specific indexed countries affecting its outcome. The scatterplot's unusual pattern in rise and fall, (unlike its usual, randomly scattered form) is due to the sorted indices of the given countries by factor score values, prior to visualization. This does not affect the given information or interpretation, given this prior is known by the analyst.

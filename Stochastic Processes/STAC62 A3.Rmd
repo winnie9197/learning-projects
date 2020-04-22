@@ -1,0 +1,50 @@
+---
+title: "STAC62 A3"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+#1a
+z_matrix <- matrix(c(5/2,1/2,1/2,5/2),nrow=2,ncol=2,byrow=TRUE)
+z_matrix
+z_inv <- solve(z_matrix)
+
+mu_a <- 2+(z_matrix[1,2]*z_inv[1,1]*(2-1))
+z_a <- z_inv[2,2]-z_matrix[1,2]*z_inv[1,1]*z_matrix[1,2]
+dnorm(1, mu_a, z_a)
+```
+
+```{r}
+#1b
+mu <- 106/48
+z <- 30/96
+dnorm(1, mu, z)
+```
+
+```{r}
+#1c) 
+library("MASS")
+n <- 10000000
+x1 <- mvrnorm(n, 1, 5/2)^2
+x2 <- mvrnorm(n, 2, 5/2)^2
+eq <- x1+x2
+sum(eq <= 5)/n
+```
+```{r}
+#4b
+F <- (1/pi)*atan(100)+1/2
+F
+F_neg <- (1/pi)*atan(-100)+1/2
+F_neg
+
+F_diff <- F-F_neg
+
+#Standard Normal
+dnorm(100,0,1)
+dnorm(-100,0,1)
+#at approximately 2.72 we have 99.6% probability
+```
+
+

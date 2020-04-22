@@ -1,0 +1,107 @@
+---
+output:
+  word_document: default
+  html_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### y
+```{r}
+library(leaps)
+value <- read.table("APPENC05.txt", quote="\"", comment.char="")
+x1 = "Identification number"
+x2 = "PSA_Level"
+x3 = "Cancer_Volume"
+x4 = "Weight"
+x5 = "Age"
+x6 = "benign_prostatic_hyperplasia"
+x7 = "seminal_vesicle_invasion"
+x8 = "capsular_penetration"
+x9 = "Gleason_score"
+colnames(value) <- c(x1,x2,x3,x4,x5,x6,x7,x8,x9)
+## leaps(x=value[,c(3,4,5,6,8)], y = value[,c(2)],names = c("Cancer_Volume","Weight","Age","benign_prostatic_hyperplasia","capsular_penetration") ,method = "Cp")
+
+
+###Cp
+Cp = leaps(x=value[,3:9], y = value[,2] ,method = "Cp")
+size = Cp$size
+Cpvalue = Cp$Cp
+Ctable = data.frame(Cp$which,Cp$size,Cp$Cp)
+colnames(Ctable) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","Cp.cp")
+
+
+### R2
+R2 = leaps(x=value[,3:9], y = value[,2] ,method = "r2")
+R2table = data.frame(R2$which,R2$size,R2$r2)
+colnames(R2table) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","R2.r2")
+
+
+### adjR2
+adjR2 = leaps(x=value[,3:9], y = value[,2] ,method = "adjr2")
+adjR2table = data.frame(adjR2$which,adjR2$size,adjR2$adjr2)
+colnames(adjR2table) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","adjR2.r2")
+
+result = merge(Ctable,R2table)
+result = merge(result,adjR2table)
+result
+write.csv(result,"t1.csv", row.names = F)
+```
+
+### lny 
+```{r}
+library(leaps)
+### set the data
+value <- read.table("APPENC05.txt", quote="\"", comment.char="")
+x1 = "Identification number"
+x2 = "PSA_Level"
+x3 = "Cancer_Volume"
+x4 = "Weight"
+x5 = "Age"
+x6 = "benign_prostatic_hyperplasia"
+x7 = "seminal_vesicle_invasion"
+x8 = "capsular_penetration"
+x9 = "Gleason_score"
+colnames(value) <- c(x1,x2,x3,x4,x5,x6,x7,x8,x9)
+
+### add y value inside the data
+value$PSA_Level = log(value$PSA_Level)
+
+###Cp
+Cp = leaps(x=value[,3:9], y = value[,2] ,method = "Cp")
+size = Cp$size
+Cpvalue = Cp$Cp
+Ctable = data.frame(Cp$which,Cp$size,Cp$Cp)
+colnames(Ctable) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","Lny_Cp.cp")
+
+
+### R2
+R2 = leaps(x=value[,3:9], y = value[,2] ,method = "r2")
+R2table = data.frame(R2$which,R2$size,R2$r2)
+colnames(R2table) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","Lny_R2.r2")
+
+
+### adjR2
+adjR2 = leaps(x=value[,3:9], y = value[,2] ,method = "adjr2")
+adjR2table = data.frame(adjR2$which,adjR2$size,adjR2$adjr2)
+colnames(adjR2table) = c(x3,x4,x5,x6,x7,x8,x9,"p.size","Lny_adjR2.r2")
+
+lnyresult = merge(Ctable,R2table)
+lnyresult = merge(lnyresult,adjR2table)
+
+lnyresult
+write.csv(lnyresult,"t2.csv", row.names = F)
+```
+
+### 
+```{}
+output = merge(result,lnyresult)
+output
+```
+
+```{r}
+write.csv(result,"Lny.csv", row.names = F)
+```

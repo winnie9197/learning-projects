@@ -1,0 +1,78 @@
+---
+title: "STAC51 A1Q3"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+library(binom)
+```
+
+3) 
+X1,X2,X3 indep,
+
+X1 ~ Pois(2) 
+X2 ~ Pois(3)
+X3 ~ Pois(4)
+```{r}
+#Assign our values
+mu1 = 2
+mu2 = 3
+mu3 = 4
+
+```
+
+a) P (X1 = 1, X2 = 5)
+
+```{r}
+#P(X1 n X2) = P(X1) * P(X2) because indep
+#P(X1)
+q1x1 <- dpois(1, mu1)
+q1x2 <- dpois(5, mu2)
+
+prob_a = q1x1 * q1x2
+round(prob_a,4)
+
+```
+Answer: P (X1 = 1, X2 = 5) ~= 0.0273
+
+b) 
+#X1+X2 ~ P(mu1+mu2)
+```{r}
+prob_b = dpois(7, mu1+mu2)
+round(prob_b,4)
+```
+
+Answer: P (X1 + X2 = 7) ~= 0.1044
+
+c)  
+Using the distribution we obtained on d):
+```{r}
+#y1 = 3, n = 7
+y1 <- 3
+n <- 7
+mu_sum = mu1/(mu1+mu2)
+prob_c = dbinom(y1, n, mu_sum)
+prob_c
+```
+
+e) 
+CalculateP(X1 =3,X2 =4,X3 =5|X1 +X2 +X3 =12)
+Using the distribution we obtained on f):
+```{r}
+x1 <- 3
+x2 <- 4
+x3 <- 5 
+x_e <- c(x1,x2,x3)
+n_e <- 12
+prob <- function(mu1,mu2,mu3) {
+  sum = sum(mu1,mu2,mu3)
+  return (c(mu1/sum, mu2/sum, mu3/sum))
+}
+mu_e = prob(mu1,mu2,mu3)
+
+prob_e = dmultinom (x_e, n_e, mu_e)
+prob_e
+```
+
