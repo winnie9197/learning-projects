@@ -3,5 +3,5 @@
 An archive for past projects/tutorials.
 
 Contents:
--Course assignments in R
--An imitation coin 
+- Course assignments in R
+- An imitation coin 
