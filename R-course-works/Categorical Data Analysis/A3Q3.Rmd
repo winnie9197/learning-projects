@@ -1,0 +1,114 @@
+---
+title: "STAC51A3Q3"
+output:
+  word_document: default
+  html_notebook: default
+---
+```{r}
+#3a)
+N <- 100 # the grand total for each table
+pi1 <- 0.1
+pi2 <- 0.2
+pi3 <- 0.3
+pi4 <- 0.4
+pi <-c(pi1, pi2, pi3, pi4)
+# Calculation of power of Pearson chi square test
+crt_value <- qchisq(0.95,3)
+pi0 <- c(0.15,0.15,0.3,0.4)
+lambdaP <- N*sum(((pi-pi0)^2)/pi0)
+lambdaP
+
+power_P <- 1-pchisq(crt_value, 3, lambdaP)
+power_P
+```
+Power is 0.3026263.
+
+```{r}
+#3b)
+# Calculation of power of likelihood ratio test
+pi0 <- c(0.15,0.15,0.3,0.4)
+lambdaLRT <- 2*N*sum(pi*log(pi/pi0))
+lambdaLRT
+
+# Note: Critical value is the same for both tests
+power_LRT <- 1-pchisq(crt_value, 3, lambdaLRT)
+power_LRT
+```
+Power is 0.3080606.
+
+```{r}
+#3c)
+set.seed(101)
+
+n <- 100000
+N <- 100
+pi <- c(0.1,0.2,0.3,0.4)
+dist <- rmultinom(n,N,pi)
+dist[,1:5]
+```
+
+```{r}
+#3d)
+chisq_v <- vector()
+chisqs <- matrix(,1,n)
+for (i in 1:n) {
+  #pearson χ2, compute summation of (n_ij-expected)^2/expected for each observation
+  total <- 0
+  for (j in 1:4) {
+    expectation = N*pi[j]
+    chisq_v[j] <-  (((dist[j,i]-expectation)^2)/expectation)
+  }
+  chisqs[1,i] <- sum(chisq_v)
+}
+chisqs[,1:5]
+```
+```{r}
+#3e
+length(which(chisqs > crt_value))/n
+```
+Proportion of tests rejected is 0.04823 at alpha=0.05, which means for 4.823% of the time, probabilities (pi1-pi4) are not as stated in null hypothesis.
+
+```{r}
+#3f
+Gsq_v <- vector()
+Gsqs <- matrix(,1,n)
+for (i in 1:n) {
+  #find G2 for each observation
+  total <- 0
+  for (j in 1:4) {
+    expectation = N*pi[j]
+    Gsq_v[j] <- dist[j,i]*log(dist[j,i]/expectation)
+  }
+  Gsqs[1,i] <- sum(Gsq_v)*2
+}
+Gsqs[,1:5]
+```
+
+```{r}
+#3g
+length(which(Gsqs > crt_value))/n
+```
+Proportion of tests rejected at alpha=0.05 is 0.05051, meaning for 5.051% of the time, the pi values aren't as stated in H0.
+
+```{r}
+#3h
+N = 0; power = 0
+while(power < 0.90) # In order to achieve power 0.90
+  { N = N+1
+  lambda = N*sum( (pi-pi0)^2/pi0 )
+ 	power =  1-pchisq(crt_value,3,lambda)
+	}
+N; power
+```
+Calculated sample size is 426 when power=0.9006331.
+```{r}
+#3i
+N = 0; power = 0
+while(power < 0.90) # In order to achieve power 0.90
+  { N = N+1
+  lambda =  2*N*sum(pi*log(pi/pi0))
+ 	power =  1-pchisq(crt_value,3,lambda)
+	}
+N; power
+```
+Calculated sample size is 418 when power=0.9007119.

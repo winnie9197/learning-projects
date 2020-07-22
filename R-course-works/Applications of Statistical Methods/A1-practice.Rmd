@@ -1,0 +1,57 @@
+---
+title: "A1-practice"
+output: html_notebook
+---
+
+
+1 - JUICE
+a)
+```{r}
+txt1="http://www.utsc.utoronto.ca/~butler/c32/ojuice.txt"
+ojuice=read_delim(txt1, " ")
+```
+b)
+```{r}
+ojuice
+```
+c)
+first line of txt file
+
+d)
+```{r}
+ggplot(ojuice, aes(x=pectin,y=sweetness))+geom_point()+geom_smooth()
+```
+
+2 - SOAP
+a) There are 27 rows:
+```{r}
+txt2 = "http://www.utsc.utoronto.ca/~butler/c32/soap.txt"
+soap = read_delim(txt2, " ")
+
+soap
+```
+b)
+```{r}
+ggplot(soap, aes(scrap)) + geom_histogram(bins=10)
+```
+
+c) By the graph of 10 bins, could describe it is approximately left-skewed (because of the large population falling on RHS), with exception of statistics of the group between approximately 240-270. Therefore in that sense, there is no significant pattern to be drawn other than the graph being right-heavy. Notable though would be the two relative peaks around 240-270 and 350-380. If the graph is looked at in other number of bins (e.g.7,9 or 14), it would appear bimodal.
+
+d)
+```{r}
+ggplot(soap, aes(line, scrap)) + geom_boxplot()
+```
+e)
+Yes, there is a difference as the median indicates so. Line b has a lower median, and most data fall into a lower overall range, meaning it produces less scrap than does line a. Most scrap production lies on the 270-370 range for both lines, which may indicate an overall pattern if given further data.
+
+f)
+```{r}
+ggplot(soap, aes(speed, scrap))+geom_point()
+```
+g) There seems to be a positive correlation between the speed and amount of scrap produced.
+
+.
+.
+.
+
+

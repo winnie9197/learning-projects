@@ -1,0 +1,74 @@
+---
+title: "STAC51A3Q1"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+#1a)
+x <- c(4,3,5,5,4,4,5,4,5,5)
+y <- c(52, 34, 63, 56, 45, 41, 69, 51, 67, 54)
+df <- data.frame(x=x,y=y)
+
+model <- glm(y~x, family="poisson", data=df)
+model
+```
+The estimated model is  y=2.7066+0.2842x.
+
+
+```{r}
+#1b) 
+summary(model)
+
+
+#G^2 = Null deviance-Residual Deviance
+G2 <- 21.9026 - 4.6435
+G2
+```
+G^2 is approximately 17.2591, df = 1, at alpha = 0.05, G^2 > 3.84 (chi-square value). We reject null hypothesis that beta = 0, meaning x has a significant effect on value of y.
+
+```{r}
+#1c)
+
+#saturated
+l2 <- prod(dpois(y,y))
+l2
+mle_sat <- -log(l2)
+mle_sat
+```
+
+```{r}
+#1d)
+#full
+mu2 <- exp(1)^(2.70660+0.28419*x)
+mu2
+l3 <- prod(dpois(y,mu2))
+l3
+mle_full <- -log(l3)
+mle_full
+
+```
+
+```{r}
+#1e)
+#reduced
+mean <- sum(y)/length(y)
+#take likelihood of poisson
+l1 <- prod(dpois(y,mean))
+l1
+#find mle
+mle_reduced <- -log(l1)
+mle_reduced
+
+```
+
+```{r}
+#1f)
+#Null Deviance  #e-c
+-2*(mle_reduced-mle_sat)
+#Residual Deviance #d-c
+-2*(mle_full-mle_sat)
+
+```
+

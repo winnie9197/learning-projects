@@ -1,0 +1,78 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+#4. Based on your selected sample survey create two research questions. Refer to the list of items (variables of interest) on your selected sample and think of the role these variables will play in your analysis (are these variables explanatory or response variables; discrete or continuous)? You will only focus on two research questions. That is, you will think about two inference questions and will use a confidence interval, a hypothesis test, or both, to draw a conclusion.
+We want to know whether the sample is a good representation of the population in two specific questions:
+
+-Variable of interest I: How old were you when you first tried smoking cigarettes, even just a few puffs?
+-Variable of interest II: How old were you when you smoked your first whole cigarette?
+By performing 
+
+SPUFF0B1
+SWHOLE0B1
+
+#5. A brief summary of the statistical methods you will use for addressing your two research questions. Think about and propose an appropriate null hypothesis significance testing for each of your selected research questions.
+
+H0 (puff): The sample mean for the first trying smoking cigarettes (even for a few puffs) is representative to the real mean, i.e. their difference is 0.
+
+H0 (whole): The sample mean for the first trying smoking cigarettes (a whole cigarette) is representative to the real mean, i.e. their difference is 0.
+
+#6. Like in Assignment #5, create a subset data based on your selected variables (items). Read your subset data in R and filter out responses that are invalid.
+
+
+```{r}
+df <- read.table("SPUFFa1-b1_SWHOLEa1-b1.csv", header = TRUE, sep = ",")
+df
+
+#values 2, 96 and 99 are invalid or provide insufficient data
+newdata_puff <- df[ which(df$spuff0b1 != 2 & df$spuff0b1 != 96 & df$spuff0b1 != 99),]
+newdata_puff
+
+newdata_whole <- df[ which(df$swholeb1 != 2 & df$swholeb1 != 96 & df$swholeb1 != 99),]
+newdata_whole
+```
+
+#7. A results section in which you state the results of your statistical analysis and discuss and interpret in context what the results mean and what you have learned about the research questions of interest. In this section, you need to include at least two graphs which displays the collected data in a manner that is informative about the questions of interest. For example, please consider the following statistical analyses and representations:
+
+# Construct appropriate graphical and numerical displays of categorical variables included in the data set with one paragraph interpretation.
+
+# Construct appropriate graphical and numerical displays of bivariate associations between two categorical variables included in the data set with one paragraph interpretation for each analysis.
+
+```{r}
+#two-sided test example
+#testing the normality assumption by qqplot, and verifying with histogram
+#Q1 (puff)
+qqnorm(newdata_puff$spuff0b1)
+hist(newdata_puff$spuff0b1)
+#Q2 (whole)
+qqnorm(newdata_puff$spuff0b1)
+hist(newdata_puff$spuff0b1)
+```
+By the plots, both sets of data look decently normal. We can assume the normality assumption is met, and perform a t-test on the datasets.
+
+```{r}
+#Q1 (puff)
+size_puff <- nrow(newdata_puff)
+size_puff
+mu_puff <- sum(newdata_puff$spuff0b1)/size_puff
+mu_puff
+t.test(newdata_puff$spuff0b1,mu=mu_puff)
+
+#Q2 (whole)
+size_whole <- nrow(newdata_whole)
+size_whole
+mu_whole <- sum(newdata_whole$swholeb1)/size_whole
+mu_whole
+t.test(newdata_whole$swholeb1,mu=mu_whole)
+```
+{Add conclusion here}
+
+```{r}
+#perform a correlation analysis
+trimmed_data <- newdata_puff[which(newdata_puff$swholeb1 != 2 & newdata_puff$swholeb1 != 96 & newdata_puff$swholeb1 != 99),]
+
+cor(trimmed_data$spuff0b1, trimmed_data$swholeb1)
+```
+The two variables are positively and highly correlated.

@@ -1,0 +1,24 @@
+---
+title: "A3 - practice"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+url="http://www.utsc.utoronto.ca/~butler/c32/pluggedin.txt"
+diary = read_delim(url, " ")
+diary
+
+```
+
+```{r}
+ggplot(diary, aes(year, hours))+geom_boxplot()
+
+ggplot(diary, aes(factor(year), hours))+geom_boxplot()
+```
+
+
+```{r}
+t.test(hours~year,data=diary,alternative="less")
+```

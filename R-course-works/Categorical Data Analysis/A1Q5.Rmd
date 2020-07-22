@@ -1,0 +1,67 @@
+---
+title: "STAC51 A1Q5"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+5)
+b)
+
+```{r}
+pi  <- 0.55 
+pnaught <- 0.5
+alpha <- 0.05
+n <- 100
+
+power_b <- 1-pnorm(((pnaught-pi)/(pi*(1-pi)/n)^0.5) + 2.33*(pnaught*pnaught/(pi*(1-pi))^0.5),0,1)
+power_b
+
+1-power_b
+
+```
+Comment: The power indicates there is 0.5658551 chance for a type II error. The score test will reject a false null hypothesis 0.4341449 chance at any given time.
+
+c)
+
+```{r}
+x <- seq(0.4,0.7,0.005)
+
+power_c <- 1-pnorm(((pnaught-x)/(x*(1-x)/n)^0.5) + 2.33*(pnaught*pnaught/(x*(1-x))^0.5),0,1)
+plot(x,power_c, main="Power Function", xlab="pi", ylab="Power of x", type="l")
+```
+
+Comment: The power function seems to be monotonic, with both of its ends approaching extreme powers of 0 and 1. With a true value of > 0.65 (approximately), we are almost certain we can reject a false null hypothesis correctly.
+
+d)
+Find pi for power(π) = 0.5.
+
+```{r}
+x_d <- seq(0.5,0.6,0.0005)
+power_d <- 1-pnorm(((pnaught-x_d)/(x_d*(1-x_d)/n)^0.5) + 2.33*(pnaught*pnaught/(x_d*(1-x_d))^0.5),0,1)
+
+table <- cbind(x_d, power_d)
+#show the subset that we want
+subset(table, power_d > 0.495 & power_d < 0.51)
+
+```
+
+Answer: When power = 0.5, π is approximately 0.558.
+
+e)
+
+```{r}
+n2 <- 200
+n3 <- 300
+
+plot(x,power_c, main="Power Function", xlab="pi", ylab="Power of x", type="l")
+par(new=T)
+power_e200 <- 1-pnorm(((pnaught-x)/(x*(1-x)/n2)^0.5) + 2.33*(pnaught*pnaught/(x*(1-x))^0.5),0,1)
+plot(x,power_e200, main="Power Function", xlab="pi", ylab="Power of x", type="l", col="red")
+par(new=T)
+power_e300 <- 1-pnorm(((pnaught-x)/(x*(1-x)/n3)^0.5) + 2.33*(pnaught*pnaught/(x*(1-x))^0.5),0,1)
+plot(x,power_e300, main="Power Function", xlab="pi", ylab="Power of x", type="l", col="green")
+par(new=T)
+```
+
+Comment: The three curves show the same trends of starting at low power until approx. 0.5 and converge at around 1 as the curve grows. As n gets larger, the curve is steeper, meaning we gain power quickly (spend time at less number of values for pi).

@@ -1,0 +1,59 @@
+---
+title: "STAC32 A4Submission"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+#9a
+library(tidyverse)
+file = "http://www.utsc.utoronto.ca/~butler/c32/nbapoints.csv"
+score = read_csv(file)
+score
+```
+We have date of the game and number of points for each game.
+
+```{r}
+#9b
+ggplot(score, aes(sample=score$Points)) + stat_qq() + stat_qq_line()
+```
+
+c) There are a small number of outliers on either end (for they are away from the line), but most of the points scored generally follow a normal distribution. Since the data is generally normal, we infer that t-test is can be an appropriate choice of test. However with the highly deviated outliers, it can be said to be 'safer' to use a sign test.
+
+```{r}
+#9d
+library(smmr)
+
+#test against 183.2
+sign_test(score,Points,183.2)
+```
+
+The sign test is already two-sided, which makes sense by the evenly distributed data points. Since the p-value is very low (<0.05), we can conclude to have strong evidence against the null hypothesis, so the average point is not 183.2.
+
+```{r}
+#10a
+file2 <- "https://www.utsc.utoronto.ca/~butler/c32/salaryinc.txt"
+salary = read_delim(file2," ")
+salary
+```
+There are two columns for salaries in January 2016 and 2017 for each employee.
+
+b)A match-pairs approach is better because we are comparing salaries of the same 20 employees with a before-and-after relationship. In order for a two-sample test to work, we would need to compare salaries of different employees at random. There would be more difficulties and variability implementing an alternative with two-sample.
+
+```{r}
+#10c
+#want: Ha = diff > 0 only => want to reject H0 (diff = 0)
+salary %>% mutate(diff=jan2017-jan2016) %>% ggplot(aes(sample=diff))+stat_qq()+stat_qq_line()
+```
+
+With a small sample size (n=20), there are a considerable number of outliers on the right. There are signs of the distribution being slightly right-skewed. With above said, the assumption for a matched-pair test fails.
+
+```{r}
+#10d
+with(salary,t.test(jan2017,jan2016,paired=T))
+```
+With the small p-value, we can be confident to reject the null hypothesis and say the salary different is not 0.
+
+e) From the output in d), we can see at "mean of the differences" that there is an average of 6.185 (dollar unit) increase for the two years. 
+

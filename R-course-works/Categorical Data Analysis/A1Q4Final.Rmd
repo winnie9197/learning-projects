@@ -1,0 +1,35 @@
+---
+title: "STAC51 A1Q4"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+4)
+a) Question: find 95% CI
+```{r}
+library(binom)
+#declare our values
+#sample size
+n = 25 
+alpha = 0.05
+success = 0.2
+```
+
+```{r}
+prob_upper <- qbinom(alpha/2, n, success)
+prob_lower <- qbinom(1-(alpha/2), n, success)
+
+prob_upper
+prob_lower
+Clopper_Pearson_CI <- c(prob_lower, prob_upper)
+Clopper_Pearson_CI
+```
+Answer: Our 95% CI is [0.06831146, 0.40703743].
+
+
+b) 
+```{r}
+y <- 5
+binom.confint(y, n, conf.level = 0.95, methods = "exact", 1-alpha)
+```

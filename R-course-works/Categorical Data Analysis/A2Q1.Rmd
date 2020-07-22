@@ -1,0 +1,115 @@
+---
+title: "STAC51A2Q1"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+
+```{r}
+#1a)
+n <- 10
+size <- 100
+pi1 <- 0.1
+pi2 <- 0.2
+pi3 <- 0.3
+pi4 <- 0.4
+
+set.seed(101)
+table <- rmultinom(n, size, prob=c(pi1=pi1, pi2=pi2, pi3=pi3, pi4=pi4))
+
+#print table
+table
+
+```
+
+
+```{r}
+#1b) Find chisquared test statisic
+expectation = c(10,20,30,40)
+chisq_v <- vector()
+for (i in 1:10) {
+  #pearson χ2, compute summation of (n_ij-expected)^2/expected for each observation
+  chisq <- sum(((table[,i]-expectation)^2)/expectation)
+  chisq_v <- c(chisq_v, chisq)
+}
+chisq_df <- data.frame(chisq_v)
+row.names(chisq_df) <- 1:10
+chisq_df
+```
+Chi-square test at alpha = 0.05 and 3df gives 7.815. Reject H0 (p-value > 7.815) for observations 6 and 7. Don't reject H0 for any other observations.
+
+```{r}
+#1c)
+Gsq_v <- vector()
+count <- 1:10
+for (i in 1:10) {
+  #find G2 for each observation
+  Gsq <- 2*sum(table[,i]*log(table[,i]/expectation))
+  Gsq_v <- c(Gsq_v, Gsq)
+}
+
+#display results
+Gsq_df <- data.frame(Gsq_v)
+row.names(Gsq_df) <- 1:10
+Gsq_df
+```
+
+```{r}
+#1d) 
+#compute differences  |χ2 − G2|
+diff <- abs(chisq_v - Gsq_v)
+
+#display all data
+output <- cbind(chisq_df, Gsq_df, diff)
+output
+
+```
+
+```{r}
+#1e)
+sum(diff>0.05)/10
+```
+Proportion pN is 0.6.
+
+```{r}
+#1f) 
+# n=100. With n=100,calculate pN for N = 200, 400, 600, · · · 20000 
+
+#setup
+new_n <- 100
+new_size <- seq(200, 20000, 200)
+set.seed(101)
+pN_output <- vector()
+diff_temp <- vector()
+
+for (i in new_size) {
+  #generate observations with new n
+  new_table <- rmultinom(new_n, i, prob=c(pi1=pi1, pi2=pi2, pi3=pi3, pi4=pi4))  
+  new_expectation <- c(pi1*i, pi2*i, pi3*i, pi4*i)
+  
+  for (j in 1:new_n) {
+    
+    #find χ2
+    new_chisq <- sum(((new_table[,j]-new_expectation)^2)/new_expectation)
+    #find G2
+    new_Gsq <- 2*sum(new_table[,j]*log(new_table[,j]/new_expectation))
+   
+    #store their difference
+    diff_temp[j] <- abs(new_chisq - new_Gsq)
+  }
+  
+  #get and store pN for each new_n
+  pN_output[i/200] <- sum(diff_temp>0.05)/new_n
+  
+  #reset temporary variables
+  diff_temp <- vector()
+  new_expectation <- vector()
+}
+output <- cbind(new_size, pN_output)
+output
+plot(output, xlab="N", ylab="pN")
+
+```
+Comment: as N increases, pN decreases. The graph looks similar to an exponential decay.
+

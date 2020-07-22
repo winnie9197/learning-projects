@@ -1,0 +1,55 @@
+---
+title: "A3-submission"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+#6a)
+url="http://www.utsc.utoronto.ca/~butler/c32/thirty.csv"
+stopwatch = read_csv(url)
+stopwatch
+```
+
+```{r}
+#6b)
+ggplot(stopwatch, aes(gender, time))+geom_boxplot()
+```
+
+6c) From the graph, we can see the median for female's guesses is closer to 30s than that for male's guesses. The spread for both the male and female sets seem to be similar, but there are more males whose guesses are far from 30s. The male group appears to be right-skewed with a longer top whisker.
+
+
+```{r}
+#6d)
+t.test(time~gender, data=stopwatch)
+```
+After conducting a t-test, we see the mean in female guesses is indeed closer to 30s (within -0.05s of 30s) comparing to the mean male guesses (>1s difference). But by the large p-value, we cannot reject the null hypothesis that there is no actual difference between male and female guesses. 
+
+e) The data is not a strong support to the claim that females are more accurate at guessing 30s than males are, given statistical characteristics as mentioned in c) and d). To further assess the claim, we can assess more data (e.g. a larger data set). Since p-value is high, choosing a smaller significant confidence interval for each set of male and female data, or plotting the existing data in another form should not strongly contribute to addressing the claim.
+
+```{r}
+#7a
+power.t.test(n=6, delta=0.08-0.075,sd=0.005,type="one.sample",alternative="two.sided")
+```
+
+With a power of 0.5068, we have close to 50% chance of correctly rejecting the mean.
+
+7b) 
+```{r}
+power.t.test(power = 0.90, delta = 0.005, sd = 0.005, type = "one.sample")
+```
+The researcher should sample n=13 (rounded up) to bring the power up to 0.90.
+
+7c) 
+```{r}
+rerun(10000,rnorm(6,0.075,0.005)) %>% 
+  map (~t.test(.,mu=0.08)) %>%
+  map_dbl("p.value") ->
+  pvals
+tibble(pvals) %>% count(pvals <= 0.05)
+```
+The power we got from simulation is close to the power we got in a). They both indicate there's close to 50% chance we correctly reject the null hypothesis.

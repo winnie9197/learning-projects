@@ -1,0 +1,76 @@
+---
+title: "STAC51A3Q2"
+output:
+  word_document: default
+  html_notebook: default
+---
+```{r}
+#2a)
+library(Rsolnp)
+likelihood <- function(pi) {
+  ll <- log(dmultinom(y, prob = c(pi[1], pi[2], pi[3], pi[4], pi[5])))
+  # return the negative to maximize rather than minimize
+  return(-ll)
+}
+
+# Constraints
+eq <- function(pi) {
+z1 <- pi[1]+pi[2]+pi[3]+pi[4]+pi[5] # For pi1+pi2+pi3+pi4+pi5=1
+return(c(z1))
+}
+constraints = c(1)
+lpi <- rep(0,5) #lower limit for pi1, pi2, pi3, pi4, pi5
+upi <- rep(1,5) #upper limit for pi1, pi2, pi3, pi4, pi5
+```
+
+```{r}
+#2b)
+y <- c(11,14,24,22,29)
+likelihood_restricted <- function(pi) {
+  ll <- log(dmultinom(y, prob = c(pi[1], pi[2], pi[3], pi[4], pi[5])))
+  # return the negative to maximize rather than minimize
+  return(-ll)
+}
+
+# Constraints
+eq2 <- function(pi) {
+z1 <- pi[1]+pi[2]+pi[3]+pi[4]+pi[5] # For pi1+pi2+pi3+pi4+pi5=1
+z2 <- pi[1]-pi[2] # For pi1=pi2 or pi1-pi2 =0
+z3 <- pi[3]-pi[4] # For pi3=pi4 or pi3-2pi4 =0
+return(c(z1, z2, z3))
+}
+constraints2 = c(1, 0, 0)
+lpi2 <- rep(0,5) #lower limit for pi1, pi2, pi3, pi4, pi5
+upi2 <- rep(1,5) #upper limit for pi1, pi2, pi3, pi4, pi5
+```
+
+```{r}
+#2c)
+pi0 <- c(1/5, 1/5, 1/5, 1/5, 1/5) # setup init values
+ctrl <- list(trace=0) # This will limit unwanted output
+sol1 <- solnp(pi0, fun = likelihood_restricted, eqfun = eq2, eqB = constraints2, LB=lpi2, UB=upi2, control=ctrl)
+sol1$pars
+```
+
+```{r}
+#2d)
+n <- sum(y)
+mu_hat <- sol1$pars*n
+
+Chi2 <- sum(((y-mu_hat)^2)/mu_hat)
+Chi2
+
+qchisq(0.95,4)
+chisq.test(y, p=sol1$pars)
+```
+At alpha = 0.05, df=4, test statistic is 9.487729 < 0.44696. Thus we cannot reject the null hypothesis that there are said associations between the variables.
+
+```{r}
+#2e)
+G2 <- 2*sum(y*log(y/mu_hat))
+G2
+
+qchisq(0.95,4)
+```
+At alpha = 0.05, df=1,4 (chi-square), test statistic is 9.487729 > 0.447853. Can reject null hypothesis.
+

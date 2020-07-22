@@ -1,0 +1,91 @@
+---
+title: "A6_submission"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+#13a
+file13 = "https://www.utsc.utoronto.ca/~butler/c32/texmex.txt"
+mex = read_delim(file13, ' ')
+mex
+```
+There are 5 columns labelled from I to V, and 10 entries for each day. There are two entries missing in column IV.
+
+13b)
+The data is not tidy because there are multiple observations in each row, and we have five different observation units in one table.
+
+```{r}
+#13c
+mex2 <- mex %>% gather(mex, traffic, I:V)
+mex2
+```
+
+```{r}
+#13d
+mex_plot <- ggplot(mex2, aes(mex,traffic))+geom_boxplot()
+mex_plot
+```
+
+```{r}
+#13e
+mex.aov <- aov(traffic~mex,data=mex2)
+summary(mex.aov)
+```
+Given the assumptions of aov,we have a small p-value (< 0.05), so we can reject the null hypothesis and conclude the mean traffic of the groups are not all equal.
+
+13f) 
+Because we have different means between the groups, Tukey is appropriate.
+```{r}
+TukeyHSD(mex.aov)
+mex_tukey <- TukeyHSD(mex.aov)
+```
+
+13g)
+```{r}
+mex2 %>% group_by(mex) %>% summarize(mean_traffic=mean(traffic,na.rm=TRUE)) %>% arrange(desc(mean_traffic))
+```
+
+By the tukey test in f), we are confident that the following comparisons (II-I, IV-I, III-II, IV-III, V-IV) differ. In this case, it would seem appropriate to set up a new franchise at IV juding by the data, because it has the highest traffic in mean and we have the most confidence that the mean differences exist.
+
+
+14a)
+
+##Introduction
+The given dataset contains information on running times for three different categories on the Boston Marathon. For regular and wheelchair runners, we want to compare if the first place winners in their gender group has shorter running times over the year since its debut in 1897.
+
+```{r}
+#14b
+file = "https://www.utsc.utoronto.ca/~butler/c32/marathon.csv"
+races = read_csv(file)
+races
+```
+We have information on the gender, year and winning time(WinTime), but we do not have different categories for regular and wheelchair athletes. WinTimes are displayed in decimal hours.
+
+c)
+```{r}
+races %>% group_by(Gender) %>% summarize(min=min(Year))
+```
+The earliest information for men and women are from 1897 and 1966 respectively. The data reflects that Women's marathon started at a later year of 1966, but it does not reflect whether the Men marathon before 1966 are purely for men or co-ed.
+
+d)
+```{r}
+ggplot(races, aes(x=Year,y=WinTime,colour=Gender))+geom_point()
+```
+
+14e) For both Men and Women, we can see the best running times are generally decreasing. Men running times are on a more consistent decreasing trend than women, where women have a more dispersed decrease toward recent years. 
+
+```{r}
+#14f
+ggplot(races, aes(x=Year,y=WinTime,colour=Gender))+geom_point()+geom_smooth(method="lm")
+```
+A fitted straight line would not be appropriate to predict future trends for the Women category, because there was a lot of variance throughout the data comparing to the fitted line. Thus the fitted line will not show an accurate trend for the future.
+
+14g)
+By our analysis, we observed there has been decreasing trends for male marathons at their best running times. Although there is been evidence that women winning times have decreased since its start, the trend does not seem to continue after year 2000. Our next steps should also be to compare not only the gold medalists, but also the second and third place runners to clarify our observations.

@@ -1,0 +1,168 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+6)
+a)
+
+```{r}
+#declare values
+ConfLevel <- 0.95
+pi <- 0.5
+alpha <- 1-ConfLevel
+z <- qnorm(1-alpha/2)
+n <- 40
+y <- 0:n
+phat <- y/n
+```
+
+i) Wald
+```{r}
+#implement formula for wald
+se.wald <- sqrt((phat*(1-phat))/n)
+wald.lower <- phat - z*se.wald
+wald.upper <- phat + z*se.wald
+p <- dbinom(y, n, pi)
+
+length_CI_Wald <- wald.upper-wald.lower
+length_x_p_Wald <- length_CI_Wald*p
+
+#take expected length
+E_length_CI_Wald <- sum(length_CI_Wald*p)
+
+#display wald
+table_wald <- cbind(y, p, wald.lower, wald.upper, E_length_CI_Wald, length_x_p_Wald)
+table_wald
+```
+
+ii) Wilson score
+```{r}
+#implement formula for score
+nstar <- n + (qnorm(1-alpha/2))^2
+w1 <- n/nstar
+w2 <- ((qnorm(1-alpha/2))^2)/nstar
+midpoint <- phat*w1+0.5*w2
+se.score <- sqrt((1/nstar)*(phat*(1-phat)*w1+0.25*w2))
+score.lower <- midpoint - qnorm(1-alpha/2)*se.score
+score.upper <- midpoint + qnorm(1-alpha/2)*se.score
+
+length_CI_Score <- score.upper-score.lower
+length_x_p_Score <- length_CI_Score*p
+
+#take expected length
+E_length_CI_Score <- sum(length_CI_Score*p)
+
+#display score data
+table_score <- cbind(y, p, score.lower, score.upper, E_length_CI_Score, length_x_p_Score)
+table_score
+
+```
+iii) Agresti-Coul
+```{r}
+#implement formula for agresti
+nstar <- n + (qnorm(1-alpha/2))^2
+pitilde = (y+(0.5*(qnorm(1-alpha/2))^2))/nstar
+agresti.lower = pitilde - qnorm(1-alpha/2)*sqrt((pitilde*(1-pitilde))/nstar)
+agresti.upper = pitilde + qnorm(1-alpha/2)*sqrt((pitilde*(1-pitilde))/nstar)
+
+length_CI_Agresti <- agresti.upper-agresti.lower
+length_x_p_Agresti <- length_CI_Agresti*p
+
+#take expected length
+E_length_CI_Agresti <- sum(length_CI_Agresti*p)
+
+#display agresti
+table_agresti <- cbind(y, p, agresti.lower, agresti.upper, E_length_CI_Agresti, length_x_p_Agresti)
+table_agresti
+```
+iv) Clopper-Pearson methods
+```{r}
+#implement the formual
+y_clopper <- 1:39
+clopper.lower <- ( 1+((n-y_clopper+1)/(y_clopper*(qf(alpha/2, 2*y_clopper, 2*(n-y_clopper+1))))))^(-1)
+clopper.upper <-( 1+((n-y_clopper)/((y_clopper+1)*(qf(1-alpha/2, 2*(y_clopper+1), 2*(n-y_clopper))))))^(-1)
+p_clopper <- dbinom(y_clopper, n, pi)
+
+length_CI_Clopper <- clopper.upper-clopper.lower
+length_x_p_Clopper <- length_CI_Clopper*p_clopper
+
+#take expected length
+E_length_CI_Clopper <- sum(length_x_p_Clopper)
+
+#display agresti
+table_clopper <- cbind(y_clopper, p_clopper, clopper.lower, clopper.upper, E_length_CI_Clopper, length_x_p_Clopper)
+table_clopper
+```
+
+6b) 
+
+```{r}
+vals <- seq(from = 0.01, to = 0.99, by = 0.01)
+numberpi <- length(vals)
+Expected_length_CI_WD <- matrix(NA, nrow = numberpi, ncol=1)
+Expected_length_CI_SC <- matrix(NA, nrow = numberpi, ncol=1)
+Expected_length_CI_AG <- matrix(NA, nrow = numberpi, ncol=1)
+Expected_length_CI_CL <- matrix(NA, nrow = numberpi, ncol=1)
+
+#Wald graph data
+se.wald_graph <- sqrt((phat*(1-phat))/n)
+lower_WD <- phat - z*se.wald_graph
+upper_WD <- phat + z*se.wald_graph
+length_CI_Wald_graph <- upper_WD-lower_WD
+
+#Score graph data
+midpoint <- phat*w1+0.5*w2
+se.score_graph <- sqrt((1/nstar)*(phat*(1-phat)*w1+0.25*w2))
+lower_SC <- midpoint - qnorm(1-alpha/2)*se.score_graph
+upper_SC <- midpoint + qnorm(1-alpha/2)*se.score_graph
+length_CI_Score_graph <- upper_SC-lower_SC
+
+#Agresti graph data
+nstar <- n + (qnorm(1-alpha/2))^2
+pitilde = (y+(0.5*(qnorm(1-alpha/2))^2))/nstar
+lower_AG <- pitilde - qnorm(1-alpha/2)*sqrt((pitilde*(1-pitilde))/nstar)
+upper_AG <- pitilde + qnorm(1-alpha/2)*sqrt((pitilde*(1-pitilde))/nstar)
+length_CI_Agresti_graph <- upper_AG-lower_AG
+
+#Clopper graph data
+lower_CL<- ( 1+((n-y_clopper+1)/(y_clopper*(qf(alpha/2, 2*y_clopper, 2*(n-y_clopper+1))))))^(-1)
+upper_CL <-( 1+((n-y_clopper)/((y_clopper+1)*(qf(1-alpha/2, 2*(y_clopper+1), 2*(n-y_clopper))))))^(-1)
+length_CI_Clopper_graph <- upper_CL - lower_CL
+
+
+for (i in (1:numberpi)) {
+  p2 <- dbinom(y, n, vals[i])
+  p2_clopper <- dbinom(y_clopper, n, vals[i])
+  Expected_length_CI_WD[i] <- sum(length_CI_Wald_graph*p2)
+  Expected_length_CI_SC[i] <- sum(length_CI_Score_graph*p2)
+  Expected_length_CI_AG[i] <- sum(length_CI_Agresti_graph*p2)
+  Expected_length_CI_CL[i] <- sum(length_CI_Clopper_graph*p2_clopper)
+}
+
+#plot Wald
+plot(vals, Expected_length_CI_WD, ylim=c(0, 0.4), main = "Expected lengths of CIs",
+xlab = expression(vals),
+ylab = "Expected length", type = "l", col = "red")
+par(new=T)
+
+#plot Score
+plot(vals, Expected_length_CI_SC, ylim=c(0, 0.4), main = "Expected lengths of CIs",
+xlab = expression(vals),
+ylab = "Expected length", type = "l", col = "blue")
+par(new=T)
+
+#plot Agresti
+plot(vals, Expected_length_CI_AG, ylim=c(0, 0.4), main = "Expected lengths of CIs",
+xlab = expression(vals),
+ylab = "Expected length", type = "l", col = "green")
+par(new=T)
+
+#plot Clopper Pearson
+plot(vals, Expected_length_CI_CL, ylim=c(0, 0.4), main = "Expected lengths of CIs",
+xlab = expression(vals),
+ylab = "Expected length", type = "l", col = "purple")
+par(new=T)
+```
