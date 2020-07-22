@@ -3,5 +3,5 @@
 An archive for past projects/tutorials.
 
 Contents:
-- Course assignments in R
-- An imitation coin 
+- R-course-works: Course assignments in R
+- fake-crypto-coin: An imitation coin for study during IBCOL 2019
