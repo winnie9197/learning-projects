@@ -1,6 +1,6 @@
 # Learning Projects
 
-An archive for past projects/tutorials.
+A list of past projects.
 
 Contents:
 - mern-expense-manager: A MERN stack expense manager
