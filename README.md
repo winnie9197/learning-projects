@@ -1,7 +1,9 @@
 # Learning Projects
 
-An archive for past projects/tutorials.
+A list of past projects.
 
 Contents:
-- R-course-works: Course assignments in R
-- fake-crypto-coin: An imitation coin for study during IBCOL 2019
+- mern-expense-manager: A expense manager (MERN Stack)
+- R-course-works: Course assignments (R)
+- fake-crypto-coin: An imitation coin for study during IBCOL 2019 (JavaScript)
+
